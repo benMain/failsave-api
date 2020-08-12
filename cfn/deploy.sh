@@ -1,8 +1,8 @@
-# aws cloudformation package \
-#     --template-file cloudformation.yaml \
-#     --s3-bucket failsave-api-resources-446226631021-us-east-1 \
-#     --output-template-file cloudformation-transformed.yaml \
-#     --profile private-account-aws
+aws cloudformation package \
+    --template-file cloudformation.yaml \
+    --s3-bucket failsave-api-resources-446226631021-us-east-1 \
+    --output-template-file cloudformation-transformed.yaml \
+    --profile private-account-aws
 
 
 # Update the Cloudformation Stack.
