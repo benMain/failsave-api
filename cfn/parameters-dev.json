@@ -1,0 +1,14 @@
+[
+    {
+        "ParameterKey": "Environment",
+        "ParameterValue": "dev"
+    },
+    {
+        "ParameterKey": "CertificateArn",
+        "ParameterValue": "arn:aws:acm:us-east-1:446226631021:certificate/af8aa751-0e2b-49de-aba7-62f020a29a78"
+    },
+    {
+        "ParameterKey": "HostedZoneId",
+        "ParameterValue": "ZRE7DHAD3SMKA"
+    }
+]

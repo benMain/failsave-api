@@ -1,0 +1,115 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: An AWS Serverless API
+Parameters:
+  Environment:
+    Type: String
+    Description: Environment; dev, sit, stg, prod
+    AllowedValues:
+    - dev
+    - sit
+    - stg
+    - prod
+  CertificateArn:
+    Type: String
+    Description: The Certificate of the Hostname for the Edge API Gateway
+  HostedZoneId:
+    Type: String
+    Description: The Id of the Hosted Zone for the DNS Record
+
+Globals:
+  Api:
+    Cors:
+      AllowMethods: "'PUT,POST,GET,DELETE,OPTIONS'"
+      AllowHeaders: "'Accept,Content-Type,X-Amz-Date,Authorization,X-Api-Key,Token,AuthToken'"
+      AllowOrigin: "'*'"
+
+Resources:
+
+  FailsaveApiRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "FailsaveApiApi-${Environment}"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: "qldb"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "qldb:*"
+                Resource: "*"
+
+
+  FailsaveApiLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/lambda-entry-point.handler
+      Runtime: nodejs12.x
+      CodeUri: artifacts.zip
+      MemorySize: 512
+      Timeout: 900
+      Role: !GetAtt FailsaveApiRole.Arn
+      Environment:
+        Variables:
+          ENVIRONMENT: !Ref Environment
+          NODE_ENV: !Ref Environment
+          QLDB_LEDGER: !Ref FailsaveLedger
+          CREATE_INDEX: "FALSE"
+
+  FailsaveApiApi:
+    Type: AWS::Serverless::Api
+    DependsOn: FailsaveApiLambda
+    Properties:
+      # AccessLogSetting:
+      #   DestinationArn: !GetAtt FailsaveApiGatewayLogGroup.Arn
+      #   Format: $context.identity.sourceIp [$context.requestTime] $context.httpMethod $context.resourcePath $context.protocol $context.integrationStatus $context.integrationLatency $context.status $context.responseLatency $context.responseLength $context.requestId
+      DefinitionBody:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: openapi.yaml
+      Domain:
+        CertificateArn: !Ref CertificateArn
+        DomainName: !Sub "${Environment}-api.failsave.io"
+        EndpointConfiguration: EDGE
+        Route53:
+          HostedZoneId: !Ref HostedZoneId
+      EndpointConfiguration: EDGE
+      MinimumCompressionSize: 2048
+      Name: !Sub "FailsaveApiApi-${Environment}"
+      StageName: !Ref Environment
+      TracingEnabled: true
+
+  FailsaveApiGatewayLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      LogGroupName: !Sub "${Environment}-failsave-api-gateway"
+      RetentionInDays: 90
+
+  FailsaveApiGatewayPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref FailsaveApiLambda
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${FailsaveApiApi}/${Environment}/*"
+
+  FailsaveLedger:
+    Type: AWS::QLDB::Ledger
+    Properties: 
+      DeletionProtection: false
+      Name: !Sub 'failsave-ledger-${Environment}'
+      PermissionsMode: ALLOW_ALL
