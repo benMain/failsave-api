@@ -15,23 +15,6 @@ tags:
     description: ""
 servers:
   - url: https://virtserver.swaggerhub.com
-components:
-  schemas:
-    User:
-      type: object
-      properties: {}
-    MonitoredApplication:
-      type: object
-      properties: {}
-    Organization:
-      type: object
-      properties: {}
-    Oncallschedule:
-      type: object
-      properties: {}
-    Incident:
-      type: object
-      properties: {}
 x-amazon-apigateway-gateway-responses:
   DEFAULT_4XX:
     responseParameters:
@@ -82,12 +65,6 @@ paths:
           in: path
           schema:
             type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/User"
       responses:
         "200":
           description: ""
@@ -116,12 +93,6 @@ paths:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${FailsaveApiLambda}/invocations
       parameters: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/User"
       responses:
         "201":
           description: ""
@@ -183,12 +154,6 @@ paths:
           in: path
           schema:
             type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/MonitoredApplication"
       responses:
         "200":
           description: ""
@@ -217,12 +182,6 @@ paths:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${FailsaveApiLambda}/invocations
       parameters: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/MonitoredApplication"
       responses:
         "201":
           description: ""
@@ -284,12 +243,6 @@ paths:
           in: path
           schema:
             type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Organization"
       responses:
         "200":
           description: ""
@@ -318,12 +271,6 @@ paths:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${FailsaveApiLambda}/invocations
       parameters: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Organization"
       responses:
         "201":
           description: ""
@@ -385,12 +332,6 @@ paths:
           in: path
           schema:
             type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Oncallschedule"
       responses:
         "200":
           description: ""
@@ -419,12 +360,6 @@ paths:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${FailsaveApiLambda}/invocations
       parameters: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Oncallschedule"
       responses:
         "201":
           description: ""
@@ -486,12 +421,6 @@ paths:
           in: path
           schema:
             type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Incident"
       responses:
         "200":
           description: ""
@@ -520,12 +449,6 @@ paths:
         uri:
           Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${FailsaveApiLambda}/invocations
       parameters: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Incident"
       responses:
         "201":
           description: ""
