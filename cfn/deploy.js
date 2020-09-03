@@ -1,3 +1,5 @@
+const { exec } = require("child_process");
+
 const { runDeployment, runDeploymentStep } = require('@aws-serverless-tools/cli');
 
 runDeployment(async ({ fileSystem, npm, cfn }) => {
@@ -48,14 +50,26 @@ runDeployment(async ({ fileSystem, npm, cfn }) => {
 
   await runDeploymentStep({
     stepName: 'Deploying',
-    action: () => cfn.deploy({
-      stackname: 'failsave-api-dev',
-      parameters: [fileSystem.getCwdPath('cfn/parameters-dev.json')],
-      tags: [fileSystem.getCwdPath('cfn/tags.json')],
-      profile: 'private-account-aws',
-      region: 'us-east-1',
-      template: fileSystem.getCwdPath('cfn/cloudformation-transformed.yaml'),
-      capabilities: 'CAPABILITY_NAMED_IAM',
-    }).promise,
+    action: () => new Promise((resolve, reject) => 
+      exec(`aws cloudformation deploy \
+      --region us-east-1 \
+      --no-fail-on-empty-changeset \
+      --template-file cfn/cloudformation-transformed.yaml \
+      --stack-name failsave-api-dev \
+      --capabilities CAPABILITY_NAMED_IAM \
+      --parameter-overrides "Environment=dev" "HostedZoneId=ZRE7DHAD3SMKA" "CertificateArn=arn:aws:acm:us-east-1:446226631021:certificate/af8aa751-0e2b-49de-aba7-62f020a29a78" \
+      --profile private-account-aws`, (error, stdout, stderr) => {
+        if (error) {
+          console.log(`error: ${error.message}`);
+          reject(error)
+          return;
+      }
+      if (stderr) {
+          console.log(`stderr: ${stderr}`);
+          return;
+      }
+      console.log(`stdout: ${stdout}`);
+      resolve(stdout);
+      }))
   });
 });

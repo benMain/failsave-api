@@ -4,7 +4,7 @@ import { Organization } from './organization';
 import { BaseService } from '../core';
 
 @Injectable()
-export class OrganizationService extends BaseService<Organization>{
+export class OrganizationService extends BaseService<Organization> {
   constructor(
     @InjectRepository(Organization)
     readonly orgRepository: Repository<Organization>,

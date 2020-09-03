@@ -19,8 +19,13 @@ import { IncidentService } from './incident/incident.service';
     AwsServerlessToolsModule,
     ConfigModule,
     NestQldbModule.forRoot({
-      qldbDriver: new QldbDriver(process.env.QLDB_LEDGER),
-      createTablesAndIndexes: process.env.CREATE_INDEX === "TRUE",
+      qldbDriver: new QldbDriver('failsave-ledger-dev', {
+        region: 'us-east-1',
+        credentials: !!process.env.NODE_ENV ? undefined : new SharedIniFileCredentials({
+          profile: 'private-account-aws',
+        }),
+      }),
+      createTablesAndIndexes: true,
     }),
   ],
   controllers: [
