@@ -151,6 +151,14 @@ Resources:
       SmsConfiguration:
         ExternalId: !Sub ${Environment}-failsave-external
         SnsCallerArn: !GetAtt SNSRole.Arn
+      DeviceConfiguration:
+        ChallengeRequiredOnNewDevice: false
+        DeviceOnlyRememberedOnUserPrompt: false
+      AliasAttributes:
+        - phone_number
+        - email
+      UsernameConfiguration:
+        CaseSensitive: false
       Schema:
         - Name: name
           AttributeDataType: String
@@ -164,9 +172,6 @@ Resources:
           AttributeDataType: String
           Mutable: false
           Required: true
-        - Name: slackId
-          AttributeDataType: String
-          Mutable: true
   
   # Creates a User Pool Client to be used by the identity pool
   UserPoolClient:
@@ -188,6 +193,14 @@ Resources:
         - http://localhost:5000/logout
       UserPoolId: !Ref UserPool
       RefreshTokenValidity: 3
+      SupportedIdentityProviders:
+        - COGNITO
+
+  UserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties: 
+      Domain: !Sub ${Environment}-failsave
+      UserPoolId: !Ref UserPool
 
 Outputs:
   UserPoolId:
